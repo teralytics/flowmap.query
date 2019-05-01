@@ -1,0 +1,7 @@
+{
+  "delay": 1000,
+  "watch": [
+    "backend/**/*",
+    "datasets.yml"
+  ]
+}

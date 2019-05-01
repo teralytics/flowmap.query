@@ -1,0 +1,51 @@
+datasets:
+
+  - name: citibike
+    title: NYC Citibike trips
+    description:
+    lastUpdated:
+
+    backend:
+      server: demo
+      counts:
+        table: nyc_citibike_trips
+        columns:
+          origin: start_station_id
+          dest: end_station_id
+          count: 1
+      K: 0
+      locations:
+        type: csv
+        file: citibike-stations.csv
+        columns:
+          id: id
+          name: name
+          latitude: lat
+          longitude: lon
+
+    attributes:
+      - name: start_date
+        label: Date
+
+      - name: trip_duration
+        label: Trip Duration
+        type: numeric
+        bucketings:
+        - name: 5-mins
+          label: 300 sec (5 min)
+          buckets: [300,600,900,1200,1500,1800,2100,2400,2700,3000]
+
+      - name: user_type
+        label: User Type
+
+      - name: gender
+        label: Gender
+
+      - name: birth_year
+        label: Birth Year
+        type: numeric
+        bucketings:
+          - name: decade
+            label: By decade
+            buckets: [1950,1960,1970,1980,1990,2000,2010]
+
