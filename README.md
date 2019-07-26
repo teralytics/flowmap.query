@@ -38,8 +38,8 @@ Add a `client/.env` file with the Mapbox access token:
     
 To build:
 
-    npm install && cd client && npm install
-    npm run build
+    npm install
+    cd client && npm install && npm run build && cd ..
   
 Then, to start in production mode:
 
