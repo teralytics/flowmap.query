@@ -15,16 +15,17 @@ It's shows [amazing query performance](https://tech.marksblogg.com/billion-nyc-t
 especially for aggregation queries over large single-table datasets. 
 This makes ClickHouse a great choice for supporting interactive analysis of OD-datasets with attributes. 
 
-For hosting a single-node ClickHouse database in the cloud we recommend DigitalOcean. Here is a tutorial 
-[how to install ClickHouse in DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-clickhouse-on-ubuntu-18-04).
+For hosting a single-node ClickHouse database in the cloud we recommend DigitalOcean. 
+Here are useful tutorials: 
+- [How to install ClickHouse in DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-clickhouse-on-ubuntu-18-04).
+- [How to set up a Node.js app in DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-18-04).
 
 Here is a [tutorial describing how to load  US flight delays dataset](https://clickhouse.yandex/tutorial.html) containing 166 million rows into ClickHouse.
 
 Here are two articles about benchmarking ClickHouse on the 1.1 Billion Taxi Rides dataset: 
 [on a single machine](https://tech.marksblogg.com/billion-nyc-taxi-clickhouse.html) and 
 [in an AWS EC2 cluster](https://tech.marksblogg.com/billion-nyc-taxi-rides-clickhouse-cluster.html). 
-The author also describes in detail how to prepare and ingest the whole dataset. 
-
+The author also describes in detail how to prepare and ingest the whole dataset.   
 
 ## Running
   
