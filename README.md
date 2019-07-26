@@ -6,15 +6,25 @@ An exploratory visualization tool for the analysis of movements between geograph
 
 
 ##  Database 
+flowmap.query currently only supports [ClickHouse](https://clickhouse.yandex/) as its database backend.
+We plan to add support for BigQuery and Google Sheets in the future. 
 
-flowmap.query currently only supports [ClickHouse](https://clickhouse.yandex/) as its database backend. We plan to add support for BigQuery and Google Sheets in the future. 
+### ClickHouse
+ClickHouse is a [scalable column-oriented database](https://clickhouse.yandex/docs/en/). 
+It's shows [amazing query performance](https://tech.marksblogg.com/billion-nyc-taxi-rides-clickhouse-cluster.html) 
+especially for aggregation queries over large single-table datasets. 
+This makes ClickHouse a great choice for supporting interactive analysis of OD-datasets with attributes. 
 
-ClickHouse is a [scalable column-oriented database](https://clickhouse.yandex/docs/en/). It's shows amazing query performance especially for aggregation queries over large single-table datasets. This makes ClickHouse a great choice for supporting  interactive analysis of such datasets. 
+For hosting a single-node ClickHouse database in the cloud we recommend DigitalOcean. Here is a tutorial 
+[how to install ClickHouse in DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-clickhouse-on-ubuntu-18-04).
 
 Here is a [tutorial describing how to load  US flight delays dataset](https://clickhouse.yandex/tutorial.html) containing 166 million rows into ClickHouse.
 
-For hosting a ClickHouse database in the cloud we recommend DigitalOcean. Here is a tutorial 
-[how to install ClickHouse in DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-clickhouse-on-ubuntu-18-04).
+Here are two articles about benchmarking ClickHouse on the 1.1 Billion Taxi Rides dataset: 
+[on a single machine](https://tech.marksblogg.com/billion-nyc-taxi-clickhouse.html) and 
+[in an AWS EC2 cluster](https://tech.marksblogg.com/billion-nyc-taxi-rides-clickhouse-cluster.html). 
+The author also describes in detail how to prepare and ingest the whole dataset. 
+
 
 ## Running
   
