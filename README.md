@@ -35,12 +35,27 @@ Add a `.env` file with ClickHouse URL:
 Add a `client/.env` file with the Mapbox access token:
   
     REACT_APP_MapboxAccessToken=...
+    
+To build:
+
+    npm install && cd client && npm install
+    npm run build
+  
+Then, to start in production mode:
+
+    npm start      
 
 ### Running in dev mode
 Run in the root folder:
+  
+    npm run dev
+
+Alternatively, you can run the server and the client separately:
 
     npm run server
     npm run client
+    
+    
     
 ## Credits
 
