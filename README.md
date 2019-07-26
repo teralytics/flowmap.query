@@ -30,7 +30,7 @@ The author also describes in detail how to prepare and ingest the whole dataset.
   
 Add a `.env` file with ClickHouse URL:
   
-    CLICKHOUSE_URL__local=http://localhost:8123?enable_http_compression=1
+    CLICKHOUSE_URL=http://localhost:8123?enable_http_compression=1
   
 Add a `client/.env` file with the Mapbox access token:
   

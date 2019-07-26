@@ -31,10 +31,10 @@ const apiRouter = new Router({
   prefix: '/api',
 })
 
-const runQuery = async (server, query) => {
-  const serverUrl = process.env[`CLICKHOUSE_URL__${server}`]
+const runQuery = async (query) => {
+  const serverUrl = process.env[`CLICKHOUSE_URL`]
   if (!serverUrl) {
-    throw new Error(`Env variable CLICKHOUSE_URL__${server} not set`)
+    throw new Error(`Env variable CLICKHOUSE_URL not set`)
   }
   const res = await fetch(serverUrl, {
     method: 'POST',
@@ -65,7 +65,7 @@ const runQuery = async (server, query) => {
 apiRouter.post('/k-loss', async ctx => {
   const {
     attributes,
-    backend: { counts: { table, columns }, server, filter = 1, K = 25 },
+    backend: { counts: { table, columns }, filter = 1, K = 25 },
   } = ctx.dataset
   const { request: { body: { filters, bucketings, selectedAttrs }} } = ctx
   if (!isValidAttrFilter(filters)) {
@@ -107,7 +107,7 @@ apiRouter.post('/k-loss', async ctx => {
     )
   `
 
-  const response = await runQuery(server, query)
+  const response = await runQuery(query)
   const tsv = await response.text()
   ctx.body = tsv
 })
@@ -115,7 +115,7 @@ apiRouter.post('/k-loss', async ctx => {
 apiRouter.post('/count-export-records', async ctx => {
   const {
     attributes,
-    backend: { counts: { table, columns }, server, filter = 1, K = 25 },
+    backend: { counts: { table, columns }, filter = 1, K = 25 },
   } = ctx.dataset
   const { request: { body: { filters, bucketings, selectedAttrs }} } = ctx
   if (!isValidAttrFilter(filters)) {
@@ -148,7 +148,7 @@ apiRouter.post('/count-export-records', async ctx => {
     WHERE 
       cnt >= ${K}
   `
-  const response = await runQuery(server, query)
+  const response = await runQuery(query)
   const tsv = await response.text()
   ctx.body = tsv
 })
@@ -156,7 +156,7 @@ apiRouter.post('/count-export-records', async ctx => {
 apiRouter.get('/export', async ctx => {
   const {
     attributes,
-    backend: { counts: { table, columns }, server, filter = 1, K = 25 },
+    backend: { counts: { table, columns }, filter = 1, K = 25 },
   } = ctx.dataset
   const { res, request: { query: { params }} } = ctx
   const { filters = {}, bucketings, selectedAttrs = [] } = JSON.parse(decodeURI(params))
@@ -222,7 +222,7 @@ apiRouter.get('/export', async ctx => {
   //   objectMode: true,
   // })
 
-  const response = await runQuery(server, query)
+  const response = await runQuery(query)
   const handle = (err) => {
     console.error(err.stack || err)
     ctx.status = 500
@@ -240,7 +240,7 @@ apiRouter.get('/export', async ctx => {
 apiRouter.post('/count-trips', async ctx => {
   const {
     attributes,
-    backend: { counts: { table, columns }, server, filter = 1 },
+    backend: { counts: { table, columns }, filter = 1 },
   } = ctx.dataset
   const { request: { body: { filters, bucketings }} } = ctx
   if (!isValidAttrFilter(filters)) {
@@ -255,13 +255,13 @@ apiRouter.post('/count-trips', async ctx => {
       ${filter}
       ${ filterBy ? ` AND ${filterBy}` : '' } 
   `
-  const response = await runQuery(server, query)
+  const response = await runQuery(query)
   const tsv = await response.text()
   ctx.body = tsv
 })
 
 apiRouter.get('/count-total-trips', async ctx => {
-  const { backend: { counts: { table, columns }, server, filter = 1 }} = ctx.dataset
+  const { backend: { counts: { table, columns }, filter = 1 }} = ctx.dataset
   const query = `
      SELECT
        SUM(${columns.count})
@@ -269,7 +269,7 @@ apiRouter.get('/count-total-trips', async ctx => {
      WHERE
       ${filter}
   `
-  const response = await runQuery(server, query)
+  const response = await runQuery(query)
   const tsv = await response.text()
   ctx.body = tsv
 })
@@ -277,7 +277,7 @@ apiRouter.get('/count-total-trips', async ctx => {
 apiRouter.post('/flows', async ctx => {
   const {
     attributes,
-    backend: { counts: { table, columns }, server, filter = 1, K = 25 },
+    backend: { counts: { table, columns }, filter = 1, K = 25 },
   } = ctx.dataset
   const { request: { body: { filters, bucketings }} } = ctx
   if (!isValidAttrFilter(filters)) {
@@ -299,7 +299,7 @@ apiRouter.post('/flows', async ctx => {
      ORDER BY count DESC 
      LIMIT 5000
   `
-  const response = await runQuery(server, query)
+  const response = await runQuery(query)
   const tsv = await response.text()
   ctx.body = tsv
 })
@@ -308,7 +308,7 @@ apiRouter.post('/flows', async ctx => {
 apiRouter.post('/attr-breakdown/:attr', async ctx => {
   const {
     attributes,
-    backend: { counts: { table, columns }, server, filter = 1, K = 25 },
+    backend: { counts: { table, columns }, filter = 1, K = 25 },
   } = ctx.dataset
   const { params: { attr }, request: { body: { filters, bucketings }} } = ctx
   if (!isValidAttr(attr)) {
@@ -335,7 +335,7 @@ apiRouter.post('/attr-breakdown/:attr', async ctx => {
     ORDER BY
       ${bucketsOrderQ}
   `
-  const response = await runQuery(server, query)
+  const response = await runQuery(query)
   const tsv = await response.text()
   ctx.body = tsv
 })

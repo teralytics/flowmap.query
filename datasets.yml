@@ -6,7 +6,6 @@ datasets:
     lastUpdated:
 
     backend:
-      server: demo
       counts:
         table: nyc_citibike_trips
         columns:
