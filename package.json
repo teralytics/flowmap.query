@@ -6,8 +6,8 @@
   "scripts": {
     "start": "env $(cat .env) NODE_ENV=production node backend/server.js",
     "build-client": "cd client && npm run build",
-    "client": "cd client && npm start",
-    "server": "env $(cat .env) nodemon backend/server.js",
+    "dev:client": "cd client && npm start",
+    "dev:server": "env $(cat .env) nodemon backend/server.js",
     "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
     "docker": "docker build"
   },

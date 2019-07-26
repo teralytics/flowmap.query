@@ -53,8 +53,8 @@ Run in the root folder:
 
 Alternatively, you can run the server and the client separately:
 
-    npm run server
-    npm run client
+    npm run dev:server
+    npm run dev:client
     
     
     
