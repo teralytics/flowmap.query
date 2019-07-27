@@ -1,7 +1,7 @@
 datasets:
 
   - name: citibike
-    title: NYC Citibike trips
+    title: NYC Citibike trips 2018
     description:
     lastUpdated:
 
