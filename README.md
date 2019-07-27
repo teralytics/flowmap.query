@@ -2,7 +2,7 @@
 
 An exploratory visualization tool for the analysis of movements between geographic locations (Origin-Destination data with attributes).
 
-Check out the [LIVE DEMO](http://query.flowmap.blue:3001/citibike).
+Try the [LIVE DEMO](http://query.flowmap.blue:3001/citibike).
 
 [![flowmap.query](https://user-images.githubusercontent.com/351828/61302543-3f6dfc00-a7e6-11e9-8a5f-3451a9f5c6f1.png)](http://query.flowmap.blue:3001/citibike)
 
