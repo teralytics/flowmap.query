@@ -20,8 +20,7 @@ especially for aggregation queries over large single-table datasets.
 This makes ClickHouse a great choice for supporting interactive analysis of OD-datasets with attributes. 
 
 For hosting a single-node ClickHouse database in the cloud we recommend DigitalOcean. 
-In this step-by-step guide we explain [How to set up and run flowmap.query on DigitalOcean]
-(https://github.com/teralytics/flowmap.query/wiki/How-to-set-up-and-run-flowmap.query-on-DigitalOcean).
+In this step-by-step guide we explain [How to set up and run flowmap.query on DigitalOcean](https://github.com/teralytics/flowmap.query/wiki/How-to-set-up-and-run-flowmap.query-on-DigitalOcean).
 
 Here are a few more useful links:
   - [How to install ClickHouse in DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-clickhouse-on-ubuntu-18-04).
