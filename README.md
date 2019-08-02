@@ -19,7 +19,7 @@ It's shows [amazing query performance](https://tech.marksblogg.com/billion-nyc-t
 especially for aggregation queries over large single-table datasets. 
 This makes ClickHouse a great choice for supporting interactive analysis of OD-datasets with attributes. 
 
-## Setting up a server in the cloud
+## Running in the cloud
 Running flowmap.query on DigitalOcean:
 [Step-by-step installation guide](https://github.com/teralytics/flowmap.query/wiki/Flowmap.query-on-DigitalOcean:-Step-by-step-guide).
 
