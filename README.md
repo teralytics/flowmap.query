@@ -21,7 +21,7 @@ This makes ClickHouse a great choice for supporting interactive analysis of OD-d
 
 ## Running in the cloud
 Running flowmap.query on DigitalOcean:
-[Step-by-step installation guide](https://github.com/teralytics/flowmap.query/wiki/Flowmap.query-on-DigitalOcean:-Step-by-step-guide).
+[Step-by-step guide](https://github.com/teralytics/flowmap.query/wiki/Flowmap.query-on-DigitalOcean:-Step-by-step-guide).
 
 ### Related reading
   - [How to install ClickHouse in DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-clickhouse-on-ubuntu-18-04).
