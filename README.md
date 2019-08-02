@@ -12,7 +12,7 @@ Try the [LIVE DEMO](http://query.flowmap.blue:3001/citibike).
 ##  Database 
 flowmap.query currently only supports [ClickHouse](https://clickhouse.yandex/) as its database backend.
 ClickHouse is a [scalable column-oriented database](https://clickhouse.yandex/docs/en/). 
-It's shows [amazing query performance](https://tech.marksblogg.com/billion-nyc-taxi-rides-clickhouse-cluster.html) 
+It's shows [great query performance](https://tech.marksblogg.com/billion-nyc-taxi-rides-clickhouse-cluster.html) 
 especially for aggregation queries over large single-table datasets. 
 This makes ClickHouse a great choice for supporting interactive analysis of OD-datasets with attributes.
 
