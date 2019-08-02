@@ -21,13 +21,15 @@ This makes ClickHouse a great choice for supporting interactive analysis of OD-d
 
 ## Setting up a server in the cloud
 For hosting a single-node ClickHouse database in the cloud we recommend DigitalOcean. 
-Here is a step-by-step guide: [How to set up and run flowmap.query on DigitalOcean](https://github.com/teralytics/flowmap.query/wiki/How-to-set-up-and-run-flowmap.query-on-DigitalOcean).
 
-Here are a few more links that can be useful:
+Running flowmap.query on DigitalOcean:
+[Step-by-step installation guide](https://github.com/teralytics/flowmap.query/wiki/How-to-set-up-and-run-flowmap.query-on-DigitalOcean).
+
+### Related reading
   - [How to install ClickHouse in DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-clickhouse-on-ubuntu-18-04).
   - [How to set up a Node.js app in DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-18-04).
   - [A tutorial describing how to load  US flight delays dataset](https://clickhouse.yandex/tutorial.html) containing 166 million rows into ClickHouse.
-  - Two articles about benchmarking ClickHouse on the 1.1 Billion Taxi Rides dataset: 
+  - Benchmarking ClickHouse on the 1.1 Billion Taxi Rides dataset: 
 [on a single machine](https://tech.marksblogg.com/billion-nyc-taxi-clickhouse.html) and 
 [in an AWS EC2 cluster](https://tech.marksblogg.com/billion-nyc-taxi-rides-clickhouse-cluster.html). 
 The author also describes in detail how to prepare and ingest the whole dataset.   
