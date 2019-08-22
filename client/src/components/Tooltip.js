@@ -17,7 +17,7 @@
 
 import * as React from 'react'
 import { Popper } from 'react-popper'
-import styled from 'react-emotion'
+import styled from '@emotion/styled'
 
 class VirtualReference {
   constructor(target) {

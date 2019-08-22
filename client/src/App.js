@@ -18,7 +18,7 @@
 import * as React from 'react'
 import { connect } from 'react-refetch'
 import { Spinner, Card, Colors } from '@blueprintjs/core'
-import styled from 'react-emotion'
+import styled from '@emotion/styled'
 import Dashboard from './Dashboard'
 import * as R from 'ramda'
 import { BrowserRouter, Route, Redirect, Switch } from 'react-router-dom'

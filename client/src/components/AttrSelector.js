@@ -18,7 +18,7 @@
 import * as React from 'react'
 import { Button, Position, Popover } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
-import styled from 'react-emotion'
+import styled from '@emotion/styled'
 import { css } from 'emotion'
 import { Tag } from '@blueprintjs/core'
 import * as R from 'ramda'

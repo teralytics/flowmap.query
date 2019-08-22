@@ -17,7 +17,7 @@
 
 import React from 'react'
 import { Intent, Spinner } from '@blueprintjs/core'
-import styled from 'react-emotion'
+import styled from '@emotion/styled'
 
 const Outer = styled('div')({
   backgroundColor: '#ffffffaa',

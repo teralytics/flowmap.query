@@ -279,7 +279,7 @@ apiRouter.post('/flows', async ctx => {
     attributes,
     backend: { counts: { table, columns }, filter = 1, K = 25 },
   } = ctx.dataset
-  const { request: { body: { filters, bucketings }} } = ctx
+  const { request: { body: { filters, bucketings, limit }} } = ctx
   if (!isValidAttrFilter(filters)) {
     throw new Error('invalid filters')
   }
@@ -297,7 +297,7 @@ apiRouter.post('/flows', async ctx => {
        ${columns.origin}, ${columns.dest}
      HAVING count >= ${K}
      ORDER BY count DESC 
-     LIMIT 5000
+     LIMIT ${escape(limit)}
   `
   const response = await runQuery(query)
   const tsv = await response.text()
