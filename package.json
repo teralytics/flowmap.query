@@ -10,7 +10,7 @@
     "dev:client": "cd client && npm start",
     "dev:server": "env $(cat .env) nodemon backend/server.js",
     "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
-    "docker": "docker build",
+    "docker": "docker build"
   },
   "author": "",
   "license": "ISC",
