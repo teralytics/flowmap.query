@@ -85,7 +85,7 @@ export default class AttrSelector extends React.Component {
           <Button
             icon={IconNames.PLUS}
           >
-            Add attributes
+            Attributes
           </Button>
         }
       />
