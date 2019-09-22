@@ -16,22 +16,23 @@
  */
 
 import * as React from 'react'
-import { findDOMNode } from 'react-dom'
-import FlowMap from './components/FlowMap'
-import MapGL, { NavigationControl } from 'react-map-gl'
-import geoViewport from '@mapbox/geo-viewport'
-import styled from 'react-emotion'
-import { Position } from '@blueprintjs/core'
+import styled from '@emotion/styled'
+import { Callout, Position } from '@blueprintjs/core'
 import { getViewportForFeature } from './util/geo'
 import * as topojson from 'topojson-client'
 import { geoCentroid } from 'd3-geo'
-import { FLOW_MAP_COLORS } from './globals'
-import { LocationTotalsLegend } from '@flowmap.gl/react'
-import Box from './components/Box'
+import { getFlowDestId, getFlowMagnitude, getFlowOriginId, getLocationCentroid, getLocationId } from './globals'
+import FlowMap from '@flowmap.gl/react'
+import * as Cluster from '@flowmap.gl/cluster'
 import withDimensions from './util/withDimensions'
 import Tooltip from './components/Tooltip'
+import tsvConnector from './util/tsvConnector'
+import SpinnerBox from './components/SpinnerBox'
+import { IconNames } from '@blueprintjs/icons'
+import { connect } from 'react-refetch'
 
 const MAPBOX_TOKEN = process.env.REACT_APP_MapboxAccessToken
+const MAX_FLOWS_NUM = 10000
 
 const Outer = styled('div')({
   position: 'absolute',
@@ -45,139 +46,186 @@ export const Legend = styled('div')(({ top, bottom, left, right }) => ({
   top, bottom, left, right,
 }))
 
-const getInitialViewState = (bbox) => {
-  const { center: [longitude, latitude], zoom } =
-    geoViewport.viewport(
-      bbox,
-      [window.innerWidth, window.innerHeight],
-      undefined, undefined, 512
-    )
-  return {
-    longitude,
-    latitude,
-    zoom,
-    bearing: 0,
-    pitch: 0,
-  }
-}
+const EMPTY = []
 
-class MapView extends React.Component {
-  state = {
-    viewport: getInitialViewState([ -180, -70, 180, 70 ]),
+const MapView = ({
+    width,
+    height,
+    filters,
+    selectedLocations,
+    bucketings,
+    datasetName,
+    locationsFetch,
+    flowsFetch,
+    onSelectLocation,
+  }) => {
+  const [state, setState] = React.useState({
+    viewport: undefined, // getInitialViewState([ -180, -70, 180, 70 ]),
     tooltip: null,
-    locationAreas: null,
-  }
+  })
+  const { viewport, tooltip } = state
 
-  componentDidMount() {
-    const { datasetName } = this.props
-    fetch(`/${datasetName}/api/geo/locations`)
-      .then(response => response.json())
-      .then(json => {
-        const { width, height } = this.props
-        const locations = (json.type === 'Topology' ?
-          topojson.feature(json, json.objects.zones) : json
-        )
-        locations.features.forEach(f => f.properties.centroid = geoCentroid(f))
-        const viewport = getViewportForFeature(locations, width, height, { pad: 0.05 })
-        this.setState({
-          locationAreas: locations,
-          viewport: viewport,
+  const locations = React.useMemo(
+    () => {
+      if (locationsFetch.fulfilled) {
+        return locationsFetch.value
+      }
+      return null
+    },
+    [locationsFetch]
+  )
+  React.useEffect(() =>
+    {
+      if (locations && !viewport) {
+        const nextViewport = getViewportForFeature(locations, width, height, { pad: 0.05 })
+        setState({
+          viewport: nextViewport
         })
-      })
-      .catch(err => console.error(err))
-  }
+      }
+    },
+    [locations, width, height]
+  )
+  const flows = React.useMemo(
+    () => {
+      if (flowsFetch.fulfilled) {
+        return flowsFetch.value
+      }
+      return null
+    },
+    [flowsFetch.value]
+  )
 
-  handleUpdateTooltip = (tooltip) => {
-    if (!tooltip) {
-      this.setState({
-        tooltip: null
+  const getLocationWeight = React.useMemo(
+    () => {
+      if (!flows) return null
+      return Cluster.makeLocationWeightGetter(flows, {
+        getFlowOriginId,
+        getFlowDestId,
+        getFlowMagnitude,
       })
-    } else {
-      const { x, y, content } = tooltip
-      const node = findDOMNode(this)
-      const { top, left, width, height } = node.getBoundingClientRect()
-      this.setState({
-        tooltip: {
-          target: {
-            left: x + left,
-            top: y + top,
-            width,
-            height,
-          },
-          placement: 'top',
-          content,
-        }
+    },
+    [flows]
+  )
+  const clusterIndex = React.useMemo(
+    () => {
+      if (!locations || !locations.features || !getLocationWeight) return null
+      const clusterLevels = Cluster.clusterLocations(
+        locations.features,
+        { getLocationId, getLocationCentroid },
+        getLocationWeight, {
+        makeClusterName: (id, numPoints) => `Cluster #${id} of ${numPoints} locations`,
       })
-    }
-  }
+      return Cluster.buildIndex(clusterLevels)
+    },
+    [flows, locations, getLocationWeight]
+  )
+  const aggregateFlowsByZoom = React.useMemo(
+    () => {
+      const aggregateFlowsByZoom = new Map()
+      if (!clusterIndex) return null
+      for (const zoom of clusterIndex.availableZoomLevels) {
+        aggregateFlowsByZoom.set(
+          zoom,
+          clusterIndex.aggregateFlows(flows, zoom, { getFlowOriginId, getFlowDestId, getFlowMagnitude }),
+        );
+      }
+      return aggregateFlowsByZoom
+    },
+    [flows, clusterIndex]
+  )
+
+  const clusterZoom = React.useMemo(
+     () => {
+       if (!state.viewport) return null
+       const { zoom } = state.viewport
+       if (!clusterIndex) return null
+       return Cluster.findAppropriateZoomLevel(clusterIndex.availableZoomLevels, zoom)
+     },
+    [clusterIndex, state.viewport]
+  )
+
+  const clusteredLocations = React.useMemo(
+     () => clusterIndex ? clusterIndex.getClusterNodesFor(clusterZoom) : EMPTY,
+    [clusterZoom, clusterIndex]
+  )
+
+  const aggregateFlows = React.useMemo(
+     () => aggregateFlowsByZoom ? aggregateFlowsByZoom.get(clusterZoom) : EMPTY,
+    [clusterZoom, aggregateFlowsByZoom]
+  )
 
 
-  handleChangeViewport = (viewport) => {
-    this.setState({
-      viewport,
-      tooltip: null,
+  const handleViewStateChange = React.useCallback((viewState) => {
+    setState({
+      viewport: viewState,
     })
-  }
+  })
 
-  render() {
-    const {
-      width,
-      height,
-      filters,
-      selectedLocations,
-      bucketings,
-      datasetName,
-      onSelectLocation,
-    } = this.props
-    const { viewport, tooltip, locationAreas } = this.state
-    return (
-      <Outer>
-        <MapGL
-          mapboxApiAccessToken={MAPBOX_TOKEN}
-          dragRotate={false}
-          touchZoom={false}
-          touchRotate={false}
-          doubleClickZoom={false}
-          minPitch={0}
-          maxPitch={0}
-          {...{
-            ...viewport,
-            width, height,
-          }}
-          onViewportChange={this.handleChangeViewport}
-        >
-          <FlowMap
-            width={width}
-            height={height}
-            viewport={viewport}
-            datasetName={datasetName}
-            filters={filters}
-            bucketings={bucketings}
-            selectedLocations={selectedLocations}
-            locations={locationAreas}
-            onUpdateTooltip={this.handleUpdateTooltip}
-            onSelectLocation={onSelectLocation}
-          />
-          <Legend top={10} right={10}>
-            <NavigationControl
-              showCompass={false}
-              onViewportChange={this.handleChangeViewport}
-            />
-          </Legend>
-          <Box bottom={40} left={10}>
-            <LocationTotalsLegend colors={FLOW_MAP_COLORS} />
-          </Box>
-        </MapGL>
-        {tooltip &&
-          <div>
-          <Tooltip
-            {...tooltip}
-            position={Position.TOP}
-          />
-          </div>
-          }
-      </Outer>
-    )
-  }
+  return (
+    <Outer>
+      {viewport &&
+      <FlowMap
+        initialViewState={viewport}
+        showTotals={true}
+        showLocationAreas={false}
+        showOnlyTopFlows={MAX_FLOWS_NUM}
+        flows={aggregateFlows}
+        locations={clusteredLocations}
+        getLocationId={(loc) => loc.id}
+        getLocationCentroid={(loc) => loc.centroid}
+        getFlowOriginId={(flow) => (Cluster.isAggregateFlow(flow) ? flow.origin : getFlowOriginId(flow))}
+        getFlowDestId={(flow) => (Cluster.isAggregateFlow(flow) ? flow.dest : getFlowDestId(flow))}
+        getFlowMagnitude={(flow) => (Cluster.isAggregateFlow(flow) ? flow.count : getFlowMagnitude(flow))}
+        mapboxAccessToken={MAPBOX_TOKEN}
+        onViewStateChange={handleViewStateChange}
+        onHighlighted={console.log}
+      />
+      }
+      {(flowsFetch.pending || flowsFetch.refreshing) && <SpinnerBox top={15} left={15} /> }
+      {flowsFetch.rejected &&
+      <Legend top={10} left={10}>
+        <Callout intent="danger" icon={IconNames.WARNING_SIGN}>
+          The flows data could not be loaded.
+        </Callout>
+      </Legend>
+      }
+      {tooltip &&
+      <div>
+        <Tooltip
+          {...tooltip}
+          position={Position.TOP}
+        />
+      </div>
+      }
+    </Outer>
+  )
 }
-export default withDimensions()(MapView)
+
+export default connect(({ datasetName }) => ({
+   locationsFetch: {
+     url: `/${datasetName}/api/geo/locations`,
+     then: (json) => {
+       const locations = (json.type === 'Topology' ?
+         topojson.feature(json, json.objects.zones) : json
+       )
+       locations.features.forEach(f => f.properties.centroid = geoCentroid(f))
+     },
+   }
+ }))(tsvConnector(
+  ([ origin, dest, count ]) => ({
+    origin,
+    dest,
+    count: +count,
+  })
+)(({ datasetName, filters, bucketings }) => ({
+  flowsFetch: {
+    url: `/${datasetName}/api/flows`,
+    method: 'POST',
+    body: JSON.stringify({
+      filters,
+      bucketings,
+      limit: MAX_FLOWS_NUM,
+    }),
+    refreshing: true,
+  }
+}))(withDimensions()(MapView)))

@@ -40,7 +40,7 @@ import { Legend } from '../MapView'
 const EMPTY = []
 
 
-class FlowMap extends React.Component {
+class FlowMapView extends React.Component {
 
   state = {
     highlightedLocationId: null,
@@ -147,7 +147,7 @@ class FlowMap extends React.Component {
     const { flowsFetch: { value }, locations } = nextProps
     if (value !== prevState.prevValue) {
       if (value && locations) {
-        const ids = FlowMap.getLocationIds(locations)
+        const ids = FlowMapView.getLocationIds(locations)
         const flows = []
         const omitted = []
         for (const f of value) {
@@ -236,4 +236,4 @@ export default tsvConnector(
     method: 'POST',
     body: JSON.stringify({ filters, bucketings }),
   }
-}))(FlowMap)
+}))(FlowMapView)

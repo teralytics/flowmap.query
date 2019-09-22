@@ -15,7 +15,7 @@
  *
  */
 
-import styled from 'react-emotion'
+import styled from '@emotion/styled'
 import { Button, Colors } from '@blueprintjs/core'
 
 const LightButton = styled(Button)({
