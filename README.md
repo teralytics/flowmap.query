@@ -4,7 +4,7 @@ An exploratory visualization tool for the analysis of movements between geograph
 
 Try the [LIVE DEMO](http://query.flowmap.blue:3001/citibike).
 
-[![flowmap.query](https://user-images.githubusercontent.com/351828/61302543-3f6dfc00-a7e6-11e9-8a5f-3451a9f5c6f1.png)](http://query.flowmap.blue:3001/citibike)
+[![flowmap.query](https://user-images.githubusercontent.com/351828/65391150-1d54a500-dd66-11e9-8574-92d3e4f3c76f.png)](http://query.flowmap.blue:3001/citibike)
 
 
 
