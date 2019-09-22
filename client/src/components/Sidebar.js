@@ -22,8 +22,8 @@ import { css } from 'emotion'
 const Sidebar = ({ style, children }) =>
   <div className={css({
     display: 'flex',
-    width: 350,
-    flex: '0 0 350px',
+    width: 400,
+    flex: '0 0 400px',
     position: 'relative',
     zIndex: 2,
   })}>

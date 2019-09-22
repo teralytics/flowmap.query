@@ -11,6 +11,7 @@
     "@deck.gl/react": "^7.1.10",
     "@emotion/core": "^10.0.16",
     "@emotion/styled": "^10.0.15",
+    "@flowmap.gl/cluster": "^6.0.0",
     "@flowmap.gl/core": "^6.0.0-alpha.10",
     "@flowmap.gl/react": "^6.0.0-alpha.10",
     "@luma.gl/constants": "^7.1.1",
