@@ -205,24 +205,24 @@ export default class Dashboard extends Component {
                 onSelectAttr={this.handleSelectAttr}
               />}
               <Filler />
-              <Popover
-                position={Position.BOTTOM_LEFT}
-                interactionKind={PopoverInteractionKind.CLICK}
-                target={
-                  <Button
-                    icon={IconNames.EXPORT}
-                  >Export</Button>
-                }
-                content={
-                  <ExportDetailsPopup
-                    datasetName={datasetName}
-                    attributes={attributes}
-                    filters={filters}
-                    bucketings={bucketings}
-                    selectedAttrs={selectedAttrs}
-                    onExport={this.handleExport}
-                  />
-                } />
+              {/*<Popover*/}
+              {/*  position={Position.BOTTOM_LEFT}*/}
+              {/*  interactionKind={PopoverInteractionKind.CLICK}*/}
+              {/*  target={*/}
+              {/*    <Button*/}
+              {/*      icon={IconNames.EXPORT}*/}
+              {/*    >Export</Button>*/}
+              {/*  }*/}
+              {/*  content={*/}
+              {/*    <ExportDetailsPopup*/}
+              {/*      datasetName={datasetName}*/}
+              {/*      attributes={attributes}*/}
+              {/*      filters={filters}*/}
+              {/*      bucketings={bucketings}*/}
+              {/*      selectedAttrs={selectedAttrs}*/}
+              {/*      onExport={this.handleExport}*/}
+              {/*    />*/}
+              {/*  } />*/}
             </Row>
             <FilterStatus
               datasetName={datasetName}
