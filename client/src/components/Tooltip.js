@@ -51,7 +51,11 @@ const ContentWrapper = styled('div')({
 })
 
 const Tooltip = ({ target, content, placement }) => (
-  <Popper placement={placement} referenceElement={new VirtualReference(target)}>
+  <Popper
+    placement={placement}
+    referenceElement={new VirtualReference(target)}
+    positionFixed={true}
+  >
     {({ ref, style, placement, arrowProps }) => (
       <ContentWrapper ref={ref} style={style} data-placement={placement}>
           { content }

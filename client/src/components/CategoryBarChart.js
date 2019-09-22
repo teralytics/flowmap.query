@@ -18,7 +18,7 @@
 import * as React from 'react'
 import SizedHorizontalBarChart from './bar-chart/SizedHorizontalBarChart'
 import { IconNames } from '@blueprintjs/icons'
-import { Card, H3, Position } from '@blueprintjs/core'
+import { Card, H3 } from '@blueprintjs/core'
 import { formatCountShort } from '../util/format'
 import { css } from 'emotion'
 import styled from '@emotion/styled'
@@ -53,14 +53,16 @@ class CategoryBarChart extends React.Component {
 
   handleValueHover = (item, e) => {
     if (item && e) {
-      const { top, left, right } = e.target.getBoundingClientRect()
+      const { top, left, width, height } = e.target.getBoundingClientRect()
       this.setState({
         tooltip: {
           target: {
-            left: (left + right) / 2,
-            top: top - 2,
+            left: left + 2,
+            top,
+            width,
+            height,
           },
-          children: `${item.y}: ${formatCount(item.x)}`,
+          content: `${item.y}: ${formatCount(item.x)}`,
         }
       })
     } else {
@@ -142,7 +144,7 @@ class CategoryBarChart extends React.Component {
             {selectedValue ? 'Clear filter' : 'Remove attr'}
           </LightButton>
         </CloseButtonArea>}
-        {tooltip && <Tooltip {...tooltip} position={Position.TOP} />}
+        {tooltip && <Tooltip {...tooltip} placement="right" />}
       </Card>
     )
   }
