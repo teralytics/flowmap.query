@@ -27,6 +27,7 @@ import FilterStatus from './components/FilterStatus'
 import Filler from './components/Filler'
 import { formatDateShort } from './util/format'
 import { parseLocalTime } from './util/format'
+import WeatherChart from './WeatherChart'
 
 
 const MapContainer = styled('div')({
@@ -36,18 +37,51 @@ const MapContainer = styled('div')({
   position: 'relative',
 })
 
-const Row = styled('div')({
-  display: 'flex',
+const Title = styled('div')({
+  fontWeight: 'bold',
 })
 
-
-const SidebarContent = styled('div')({
+const Cell = styled('div')({
   display: 'flex',
+  width: '100%',
+  flexGrow: 1,
+})
+
+const Outer = styled('div')({
+  display: 'flex',
+  width: '100%',
+  '& > div': {
+    padding: 10,
+    display: 'flex',
+    flexGrow: 1,
+    justifyContent: 'center',
+  }
+})
+
+const Column = styled('div')({
+  padding: 10,
+  display: 'flex',
+  flexGrow: 1,
   flexDirection: 'column',
-  '& > *:not(:first-child)': {
-    marginBottom: 20,
-  },
+  alignItems: 'center',
+  '& > *+*': {
+    marginTop: 20,
+  }
 })
+
+
+const Row = styled('div')({
+  padding: 10,
+  display: 'flex',
+  flexGrow: 1,
+  flexDirection: 'row',
+  alignItems: 'center',
+  '& > *+*': {
+    marginLeft: 20,
+  }
+})
+
+
 
 
 export default class Dashboard extends Component {
@@ -73,17 +107,6 @@ export default class Dashboard extends Component {
         }
       }
     })
-
-  handleChangeAttrBucketing = (bucketingName, attrName) => {
-    this.setState(prevState => ({
-      ...prevState,
-      bucketings: {
-        ...prevState.bucketings,
-        [attrName]: bucketingName,
-      },
-      filters: R.omit([attrName], prevState.filters),
-    }))
-  }
 
   handleSelectLocation = (id) => {
     this.setState(prevState => {
@@ -126,28 +149,6 @@ export default class Dashboard extends Component {
       }
     }))
 
-  handleExport = () => {
-    const {
-      dataset: {
-        name: datasetName,
-      },
-    } = this.props
-    const {
-      filters,
-      selectedAttrs,
-      bucketings,
-    } = this.state
-    window.open(
-      `/${datasetName}/api/export?params=${encodeURI(
-        JSON.stringify({ 
-          filters, 
-          selectedAttrs: selectedAttrs,
-          bucketings,
-        })
-      )}`
-    )
-  }
-
   render() {
     const {
       dataset: {
@@ -166,87 +167,29 @@ export default class Dashboard extends Component {
       selectedAttrs,
     } = this.state
     return (
-      <>
-        <MapContainer>
-          <MapView
-            datasetName={datasetName}
-            filters={filters}
-            selectedLocations={selectedLocations}
-            bucketings={bucketings}
-            onSelectLocation={this.handleSelectLocation}
-          />
-        </MapContainer>
-        <Sidebar>
-          <SidebarContent>
-            <H2>{title}</H2>
-            {description && <p>{description}</p>}
-            <table>
-              <tbody>
-                {timePeriod && <tr>
-                  <td>Time period:</td>
-                  <td>{
-                    timePeriod
-                      .map(d => formatDateShort(parseLocalTime(d)))
-                      .join(' - ')
-                  }</td>
-                </tr>}
-                {lastUpdated && <tr>
-                  <td>Last updated:</td>
-                  <td>{formatDateShort(parseLocalTime(lastUpdated))}</td>
-                </tr>}
-              </tbody>
-            </table>
-            <Row>
-              {attributes && <AttrSelector
-                attributes={attributes}
-                selectedAttrs={selectedAttrs}
-                onSelectAttr={this.handleSelectAttr}
-              />}
-              <Filler />
-              {/*<Popover*/}
-              {/*  position={Position.BOTTOM_LEFT}*/}
-              {/*  interactionKind={PopoverInteractionKind.CLICK}*/}
-              {/*  target={*/}
-              {/*    <Button*/}
-              {/*      icon={IconNames.EXPORT}*/}
-              {/*    >Export</Button>*/}
-              {/*  }*/}
-              {/*  content={*/}
-              {/*    <ExportDetailsPopup*/}
-              {/*      datasetName={datasetName}*/}
-              {/*      attributes={attributes}*/}
-              {/*      filters={filters}*/}
-              {/*      bucketings={bucketings}*/}
-              {/*      selectedAttrs={selectedAttrs}*/}
-              {/*      onExport={this.handleExport}*/}
-              {/*    />*/}
-              {/*  } />*/}
-            </Row>
-            <FilterStatus
+      <Outer>
+        <Column>
+          <Cell>
+            <WeatherChart
               datasetName={datasetName}
-              filters={filters}
-              bucketings={bucketings}
-              onClear={this.handleClearFilters}
             />
-            {
-              selectedAttrs.map(attrName =>
-                <CategoryBarChart
-                  key={attrName}
-                  datasetName={datasetName}
-                  attribute={attributes.find(({ name }) => name === attrName)}
-                  selectedBucketing={bucketings[attrName]}
-                  selectedValue={filters[attrName]}
-                  filters={R.omit([attrName], filters)}
-                  bucketings={bucketings}
-                  onClose={() => this.handleRemoveAttr(attrName)}
-                  onChangeBucketing={({ name }) => this.handleChangeAttrBucketing(name, attrName)}
-                  onSelectValue={value => this.handleFilterValue(attrName, value)}
-                />
-              )
-            }
-          </SidebarContent>
-        </Sidebar>
-      </>
+          </Cell>
+          <Row>
+            <Column>
+              <Title>Time 1</Title>
+              <Cell>
+
+              </Cell>
+            </Column>
+            <Column>
+              <Title>Time 2</Title>
+              <Cell>
+
+              </Cell>
+            </Column>
+          </Row>
+        </Column>
+      </Outer>
     )
   }
 }

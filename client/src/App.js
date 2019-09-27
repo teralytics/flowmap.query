@@ -58,9 +58,9 @@ class App extends React.Component {
     return (
       <BrowserRouter>
         <Outer>
-          <Navbar>
-            <Logo fill={Colors.WHITE} />
-          </Navbar>
+          {/*<Navbar>*/}
+          {/*  <Logo fill={Colors.WHITE} />*/}
+          {/*</Navbar>*/}
           {pending ?
             <BlockingSpinner/>
             :

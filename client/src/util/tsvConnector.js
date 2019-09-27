@@ -16,11 +16,11 @@
  */
 
 import { connect } from 'react-refetch'
-import { tsvParseRows } from 'd3-dsv'
+import { dsvFormat } from 'd3-dsv'
 
 // const cache = new Map()
 
-const tsvConnector = (transformRow) => connect.defaults({
+const tsvConnector = (transformRow, opts) => connect.defaults({
   // TODO: use LRU cache
   // caching forever
   // fetch: (input, init) => {
@@ -41,6 +41,7 @@ const tsvConnector = (transformRow) => connect.defaults({
   // },
 
   handleResponse: function (response) {
+    const { separator = '\t' } = opts || {};
     if (response.headers.get('content-length') === '0' || response.status === 204) {
       return
     }
@@ -49,7 +50,7 @@ const tsvConnector = (transformRow) => connect.defaults({
       return text.then(text => new Promise((resolve, reject) => {
         let rows
         try {
-          rows = tsvParseRows(text, transformRow)
+          rows = dsvFormat(separator).parseRows(text, transformRow)
           resolve(rows)
         } catch (err) {
           reject(err)

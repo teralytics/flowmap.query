@@ -24,6 +24,7 @@ const send = require('koa-send')
 const bodyParser = require('koa-bodyparser')
 const yaml = require('js-yaml')
 const fs = require('fs')
+const path = require('path')
 const apiRouter = require('./api')
 const compress = require('koa-compress')
 

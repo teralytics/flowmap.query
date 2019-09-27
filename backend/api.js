@@ -41,6 +41,7 @@ const runQuery = async (query) => {
     body: `${query} FORMAT CSV`,
   });
 
+  console.log(query)
   if (!res.ok) {
     console.error('query returned with non-200 status:', res.statusText);
     const text = await res.text();
@@ -236,7 +237,6 @@ apiRouter.get('/export', async ctx => {
 })
 
 
-
 apiRouter.post('/count-trips', async ctx => {
   const {
     attributes,
@@ -268,6 +268,59 @@ apiRouter.get('/count-total-trips', async ctx => {
      FROM ${table}
      WHERE
       ${filter}
+  `
+  const response = await runQuery(query)
+  const tsv = await response.text()
+  ctx.body = tsv
+})
+
+apiRouter.post('/trips-by-date', async ctx => {
+  const {
+    attributes,
+    backend: { counts: { table, columns },
+    filter = 1,
+  }} = ctx.dataset
+  const { request: { body: { filters, bucketings, limit }} } = ctx
+  const filterBy = getFiltersQueryCondition(filters, attributes, bucketings)
+  const query = `
+    SELECT
+      start_date, SUM(${columns.count}) AS trips
+    FROM
+      ${table}
+    WHERE
+      ${filter}
+      ${ filterBy ? ` AND ${filterBy}` : '' }     
+    GROUP BY
+      start_date
+    ORDER BY
+      start_date ASC
+  `
+  const response = await runQuery(query)
+  const tsv = await response.text()
+  ctx.body = tsv
+})
+
+apiRouter.post('/avg-duration-by-date', async ctx => {
+  const {
+    attributes,
+    backend: { counts: { table, columns },
+    filter = 1,
+  }} = ctx.dataset
+  const { request: { body: { filters, bucketings, limit }} } = ctx
+  const filterBy = getFiltersQueryCondition(filters, attributes, bucketings)
+  const query = `
+    SELECT
+      start_date,
+       avg(trip_duration) as avg_duration
+    FROM
+      ${table}
+    WHERE
+      ${filter}
+      ${ filterBy ? ` AND ${filterBy}` : '' }     
+    GROUP BY
+      start_date
+    ORDER BY
+      start_date ASC
   `
   const response = await runQuery(query)
   const tsv = await response.text()
@@ -367,6 +420,10 @@ apiRouter.get('/geo/locations', async (ctx) => {
     default:
       await send(ctx, `./static/locations/${file}`)
   }
+})
+
+apiRouter.get('/weather', async (ctx) => {
+  await send(ctx, `./static/weather/ny-2018.csv`)
 })
 
 
