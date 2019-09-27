@@ -148,6 +148,10 @@ export default class Dashboard extends Component {
     )
   }
 
+  handleSelectLocation = (id) => {
+    console.log('handleSelectLocation')
+  }
+
   render() {
     const {
       dataset: {

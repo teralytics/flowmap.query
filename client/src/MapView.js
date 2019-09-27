@@ -51,6 +51,7 @@ const EMPTY = []
 const MapView = ({
     width,
     height,
+    viewState,
     filters,
     selectedLocations,
     bucketings,
@@ -58,6 +59,7 @@ const MapView = ({
     locationsFetch,
     flowsFetch,
     onSelectLocation,
+    onViewStateChange,
   }) => {
   const [state, setState] = React.useState({
     viewport: undefined, // getInitialViewState([ -180, -70, 180, 70 ]),
@@ -73,6 +75,16 @@ const MapView = ({
       return null
     },
     [locationsFetch]
+  )
+  React.useEffect(() =>
+    {
+      if (viewState && viewport !== viewState) {
+        setState({
+          viewport: viewState
+        })
+      }
+    },
+    [viewState]
   )
   React.useEffect(() =>
     {
@@ -159,6 +171,7 @@ const MapView = ({
     setState({
       viewport: viewState,
     })
+    onViewStateChange(viewState)
   })
 
   return (
