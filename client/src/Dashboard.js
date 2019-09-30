@@ -478,8 +478,8 @@ export default class Dashboard extends Component {
     selectedLocations: [],
     bucketings: {},
     selectedAttrs: [],
-    selectedDate1: '2018-02-01',
-    selectedDate2: '2018-06-01',
+    selectedDate1: '2018-01-15',
+    selectedDate2: '2018-07-02',
   }
 
   handleRemoveAttr = (attrName) =>
@@ -594,21 +594,21 @@ export default class Dashboard extends Component {
               showTrackFill={false}
               min={0}
               max={dates.length - 1}
-              stepSize={1}
-              labelStepSize={1000}
-              onChange={i => this.handleSelectedDate1(dates[i])}
-              labelRenderer={() => null}
-              value={dates.indexOf(selectedDate1)}
-            />
-            <Slider
-              showTrackFill={false}
-              min={0}
-              max={dates.length - 1}
               labelStepSize={1000}
               stepSize={1}
               onChange={i => this.handleSelectedDate2(dates[i])}
               labelRenderer={() => null}
               value={dates.indexOf(selectedDate2)}
+            />
+            <Slider
+              showTrackFill={false}
+              min={0}
+              max={dates.length - 1}
+              stepSize={1}
+              labelStepSize={1000}
+              onChange={i => this.handleSelectedDate1(dates[i])}
+              labelRenderer={() => null}
+              value={dates.indexOf(selectedDate1)}
             />
           </div>
           <Cell>
@@ -616,7 +616,7 @@ export default class Dashboard extends Component {
               <MapContainer>
                 <MapView
                   datasetName={datasetName}
-                  // viewState={this.state.mapViewState}
+                  viewState={this.state.mapViewState}
                   filters={{
                     start_date: selectedDate1,
                   }}
@@ -628,7 +628,7 @@ export default class Dashboard extends Component {
               </MapContainer>
               <MapContainer>
                 <MapView
-                  // viewState={this.state.mapViewState}
+                  viewState={this.state.mapViewState}
                   datasetName={datasetName}
                   filters={{
                     start_date: selectedDate2,

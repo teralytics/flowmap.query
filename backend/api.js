@@ -311,7 +311,7 @@ apiRouter.post('/avg-duration-by-date', async ctx => {
   const query = `
     SELECT
       start_date,
-       MEAN(trip_duration) as avg_duration
+       AVG(trip_duration) as avg_duration
     FROM
       ${table}
     WHERE
