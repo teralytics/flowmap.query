@@ -53,7 +53,6 @@ const MapView = ({
     height,
     filters,
     selectedLocations,
-    bucketings,
     datasetName,
     locationsFetch,
     flowsFetch,
@@ -217,13 +216,12 @@ export default connect(({ datasetName }) => ({
     dest,
     count: +count,
   })
-)(({ datasetName, filters, bucketings }) => ({
+)(({ datasetName, filters }) => ({
   flowsFetch: {
     url: `/${datasetName}/api/flows`,
     method: 'POST',
     body: JSON.stringify({
       filters,
-      bucketings,
       limit: MAX_FLOWS_NUM,
     }),
     refreshing: true,

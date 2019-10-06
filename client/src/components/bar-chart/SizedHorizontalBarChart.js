@@ -121,7 +121,7 @@ class SizedHorizontalBarChart extends React.PureComponent {
       >
         <VerticalGridLines />
         <HorizontalBarSeries
-          data={dataPoints}
+          data={dataPoints.slice().reverse()}
           style={styles.barSeries}
           onValueClick={onValueClick}
           onValueMouseOver={this.handleValueMouseOver}

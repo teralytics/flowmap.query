@@ -230,10 +230,10 @@ export default tsvConnector(
     dest,
     count: +count,
   })
-)(({ datasetName, filters, bucketings }) => ({
+)(({ datasetName, filters }) => ({
   flowsFetch: {
     url: `/${datasetName}/api/flows`,
     method: 'POST',
-    body: JSON.stringify({ filters, bucketings }),
+    body: JSON.stringify({ filters }),
   }
 }))(FlowMapView)

@@ -16,7 +16,6 @@
  */
 
 const R = require('ramda')
-const { getBucketConditionQ } = require('./buckets')
 const { escape, escapeId } = require('sqlstring')
 
 const isValidAttr = (attr) => /^[\w_\-]+$/.test(attr)
@@ -35,19 +34,18 @@ const isValidAttrFilter = (filters) => {
 const findAttribute = (attributes, attrName) =>
   attributes.find(attr => attr.name === attrName)
 
-const getFiltersQueryCondition = (filters, attributes, bucketings = {}) => {
+const getFiltersQueryCondition = (filters, attributes) => {
   if (filters) {
     return R.pipe(
       R.toPairs(),
       R.map(([ attrName, v ]) => {
-        switch (findAttribute(attributes, attrName).type) {
+        const attr = findAttribute(attributes, attrName)
+        switch (attr.type) {
           case 'numeric': {
-            const bucketName = filters[attrName]
-            const q = getBucketConditionQ(bucketName, attrName, attributes, bucketings)
-            return q || `${escapeId(attrName)}=${escape(v)}`
+            return `${attr.expression || escapeId(attrName)}=${escape(+v)}`
           }
           default:
-            return `${escapeId(attrName)}=${escape(v)}`
+            return `${attr.expression || escapeId(attrName)}=${escape(v)}`
         }
       })
     )(filters).join(' AND ')
@@ -59,4 +57,5 @@ module.exports = {
   getFiltersQueryCondition,
   isValidAttr,
   isValidAttrFilter,
+  findAttribute,
 }

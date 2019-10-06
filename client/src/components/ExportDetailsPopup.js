@@ -89,16 +89,6 @@ const ExportDetailsPopup = ({
           </td>
         </tr>
         <tr>
-          <th>K-anonymity loss:</th>
-          <td className={valueCellStyle}>
-            {lossFetch.pending ?
-              <Loading/>
-              :
-              <span>{formatPercentage(R.path(['value', 0, 'loss'], lossFetch))}</span>
-            }
-          </td>
-        </tr>
-        <tr>
           <th>Number of trips:</th>
           <td className={valueCellStyle}>
             {countsFetch.pending ?
@@ -140,22 +130,22 @@ export default R.compose(
     ([ numRecords, tripCount ]) => ({
       numRecords, tripCount
     })
-  )(({ datasetName, filters, bucketings, selectedAttrs }) => ({
+  )(({ datasetName, filters, selectedAttrs }) => ({
     countsFetch: {
       url: `/${datasetName}/api/count-export-records`,
       method: 'POST',
-      body: JSON.stringify({ filters, bucketings, selectedAttrs }),
+      body: JSON.stringify({ filters, selectedAttrs }),
     }
   })),
   tsvConnector(
     ([ loss ]) => ({
       loss,
     })
-  )(({ datasetName, filters, bucketings, selectedAttrs }) => ({
+  )(({ datasetName, filters, selectedAttrs }) => ({
     lossFetch: {
       url: `/${datasetName}/api/k-loss`,
       method: 'POST',
-      body: JSON.stringify({ filters, bucketings, selectedAttrs }),
+      body: JSON.stringify({ filters, selectedAttrs }),
     }
   })),
 )(ExportDetailsPopup)

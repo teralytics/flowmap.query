@@ -113,11 +113,11 @@ export default R.compose(
     props => props.hasFilter,
     tsvConnector(
       ([ filterTripCount ]) => filterTripCount
-    )(({ datasetName, filters, bucketings }) => ({
+    )(({ datasetName, filters }) => ({
       filterTripCountFetch: {
         url: `/${datasetName}/api/count-trips`,
         method: 'POST',
-        body: JSON.stringify({ filters, bucketings }),
+        body: JSON.stringify({ filters }),
       }
     }))
   ),

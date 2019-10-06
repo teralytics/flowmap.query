@@ -15,6 +15,7 @@
  *
  */
 
+
 const Router = require('koa-router')
 const fetch = require('node-fetch')
 const csv = require('csv-parse')
@@ -23,9 +24,9 @@ const csvStringify = require('csv-stringify')
 const send = require('koa-send')
 const fs = require('fs')
 const { escapeId } = require('sqlstring')
+const { findAttribute } = require('./filters')
 
 const { getFiltersQueryCondition, isValidAttr, isValidAttrFilter } = require('./filters')
-const { getBucketsOrderQ, getBucketsSelectQ } = require ('./buckets')
 
 const apiRouter = new Router({
   prefix: '/api',
@@ -36,6 +37,7 @@ const runQuery = async (query) => {
   if (!serverUrl) {
     throw new Error(`Env variable CLICKHOUSE_URL not set`)
   }
+  console.log(query)
   const res = await fetch(serverUrl, {
     method: 'POST',
     body: `${query} FORMAT CSV`,
@@ -62,104 +64,14 @@ const runQuery = async (query) => {
   return res;
 }
 
-apiRouter.post('/k-loss', async ctx => {
-  const {
-    attributes,
-    backend: { counts: { table, columns }, filter = 1, K = 25 },
-  } = ctx.dataset
-  const { request: { body: { filters, bucketings, selectedAttrs }} } = ctx
-  if (!isValidAttrFilter(filters)) {
-    throw new Error('invalid filters')
-  }
-  for (const attr of selectedAttrs) {
-    if (!isValidAttr(attr)) throw new Error('Invalid attr')
-  }
-  const groupBy = [
-    columns.origin,
-    columns.dest,
-    ...selectedAttrs.map(attrName =>
-       getBucketsSelectQ(attrName, attributes, bucketings)
-    )
-  ]
-  const filterBy = getFiltersQueryCondition(filters, attributes, bucketings)
-
-  const query = `
-    SELECT (
-      (SELECT 
-          SUM(cnt) 
-        FROM (
-          SELECT SUM(Count) cnt 
-          FROM ${table} 
-          WHERE
-            ${filter}
-            ${ filterBy ? ` AND ${filterBy}` : '' } 
-          GROUP BY ${groupBy.map(escapeId)}
-          HAVING cnt < ${K} 
-        ) 
-      ) / 
-      (SELECT 
-         SUM(Count) cnt 
-       FROM ${table} 
-       WHERE
-         ${filter} 
-         ${ filterBy ? ` AND ${filterBy}` : '' } 
-       ) 
-    )
-  `
-
-  const response = await runQuery(query)
-  const tsv = await response.text()
-  ctx.body = tsv
-})
-
-apiRouter.post('/count-export-records', async ctx => {
-  const {
-    attributes,
-    backend: { counts: { table, columns }, filter = 1, K = 25 },
-  } = ctx.dataset
-  const { request: { body: { filters, bucketings, selectedAttrs }} } = ctx
-  if (!isValidAttrFilter(filters)) {
-    throw new Error('invalid filters')
-  }
-  for (const attr of selectedAttrs) {
-    if (!isValidAttr(attr)) throw new Error('Invalid attr')
-  }
-  const groupBy = [
-    columns.origin,
-    columns.dest,
-    ...selectedAttrs.map(attrName =>
-       getBucketsSelectQ(attrName, attributes, bucketings)
-    )
-  ]
-  const filterBy = getFiltersQueryCondition(filters, attributes, bucketings)
-
-  const query = `
-    SELECT 
-      COUNT(*) AS numRecords, 
-      SUM(cnt) AS tripCount   
-    FROM (
-      SELECT SUM(Count) cnt 
-      FROM ${table} 
-      WHERE
-        ${filter}
-        ${ filterBy ? ` AND ${filterBy}` : '' } 
-      GROUP BY ${groupBy.map(escapeId)}
-    ) 
-    WHERE 
-      cnt >= ${K}
-  `
-  const response = await runQuery(query)
-  const tsv = await response.text()
-  ctx.body = tsv
-})
 
 apiRouter.get('/export', async ctx => {
   const {
     attributes,
-    backend: { counts: { table, columns }, filter = 1, K = 25 },
+    backend: { counts: { table, columns }, filter = 1 },
   } = ctx.dataset
   const { res, request: { query: { params }} } = ctx
-  const { filters = {}, bucketings, selectedAttrs = [] } = JSON.parse(decodeURI(params))
+  const { filters = {}, selectedAttrs = [] } = JSON.parse(decodeURI(params))
   if (!isValidAttrFilter(filters)) {
     throw new Error('invalid filters')
   }
@@ -169,14 +81,14 @@ apiRouter.get('/export', async ctx => {
   const selectColumns = [
     columns.origin,
     columns.dest,
-    ...selectedAttrs.map(attrName => `${getBucketsSelectQ(attrName, attributes, bucketings)} AS ${attrName}_g`)
+    ...selectedAttrs,
   ]
   const groupByColumns = [
     columns.origin,
     columns.dest,
-    ...selectedAttrs.map(attrName => `${attrName}_g`),
+    ...selectedAttrs,
   ]
-  const filterBy = getFiltersQueryCondition(filters, attributes, bucketings)
+  const filterBy = getFiltersQueryCondition(filters, attributes)
 
   const query = `
     SELECT 
@@ -187,7 +99,6 @@ apiRouter.get('/export', async ctx => {
       ${filter}
       ${ filterBy ? ` AND ${filterBy}` : '' } 
     GROUP BY ${groupByColumns.map(escapeId).join(',')}
-    HAVING cnt >= ${K}
   `
 
   const filename = 'export.csv'
@@ -242,11 +153,11 @@ apiRouter.post('/count-trips', async ctx => {
     attributes,
     backend: { counts: { table, columns }, filter = 1 },
   } = ctx.dataset
-  const { request: { body: { filters, bucketings }} } = ctx
+  const { request: { body: { filters }} } = ctx
   if (!isValidAttrFilter(filters)) {
     throw new Error('invalid filters')
   }
-  const filterBy = getFiltersQueryCondition(filters, attributes, bucketings)
+  const filterBy = getFiltersQueryCondition(filters, attributes)
 
   const query = `
     SELECT SUM(${columns.count}) cnt 
@@ -277,13 +188,13 @@ apiRouter.get('/count-total-trips', async ctx => {
 apiRouter.post('/flows', async ctx => {
   const {
     attributes,
-    backend: { counts: { table, columns }, filter = 1, K = 25 },
+    backend: { counts: { table, columns }, filter = 1 },
   } = ctx.dataset
-  const { request: { body: { filters, bucketings, limit }} } = ctx
+  const { request: { body: { filters, limit }} } = ctx
   if (!isValidAttrFilter(filters)) {
     throw new Error('invalid filters')
   }
-  const filterBy = getFiltersQueryCondition(filters, attributes, bucketings)
+  const filterBy = getFiltersQueryCondition(filters, attributes)
   const query = `
      SELECT
        ${columns.origin}, 
@@ -295,7 +206,6 @@ apiRouter.post('/flows', async ctx => {
       ${ filterBy ? ` AND ${filterBy}` : '' }     
      GROUP BY
        ${columns.origin}, ${columns.dest}
-     HAVING count >= ${K}
      ORDER BY count DESC 
      LIMIT ${escape(limit)}
   `
@@ -308,32 +218,30 @@ apiRouter.post('/flows', async ctx => {
 apiRouter.post('/attr-breakdown/:attr', async ctx => {
   const {
     attributes,
-    backend: { counts: { table, columns }, filter = 1, K = 25 },
+    backend: { counts: { table, columns }, filter = 1 },
   } = ctx.dataset
-  const { params: { attr }, request: { body: { filters, bucketings }} } = ctx
-  if (!isValidAttr(attr)) {
+  const { params, request: { body: { filters }} } = ctx
+  const attr = findAttribute(attributes, params.attr)
+  if (!attr) {
     throw new Error('invalid attr')
   }
   if (!isValidAttrFilter(filters)) {
     throw new Error('invalid filters')
   }
 
-  const filterBy = getFiltersQueryCondition(filters, attributes, bucketings)
-  const bucketsQ = getBucketsSelectQ(attr, attributes, bucketings)
-  const bucketsOrderQ = getBucketsOrderQ(attr, attributes, bucketings)
+  const filterBy = getFiltersQueryCondition(filters, attributes)
   const query = `
     SELECT
-      ${bucketsQ} AS ${attr},
+      ${attr.expression || attr.name} AS ${attr.name},
       SUM(${columns.count}) As count
     FROM ${table}
     WHERE
       ${filter}
       ${ filterBy ? ` AND ${filterBy}` : '' }
     GROUP BY
-      ${escapeId(attr)}
-    HAVING count >= ${K}
-    ORDER BY
-      ${bucketsOrderQ}
+      ${escapeId(attr.name)}
+    ORDER BY   
+      ${escapeId(attr.name)} ASC
   `
   const response = await runQuery(query)
   const tsv = await response.text()

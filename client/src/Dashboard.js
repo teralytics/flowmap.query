@@ -54,7 +54,6 @@ export default class Dashboard extends Component {
   state = {
     filters: {},
     selectedLocations: [],
-    bucketings: {},
     selectedAttrs: [],
   }
 
@@ -73,17 +72,6 @@ export default class Dashboard extends Component {
         }
       }
     })
-
-  handleChangeAttrBucketing = (bucketingName, attrName) => {
-    this.setState(prevState => ({
-      ...prevState,
-      bucketings: {
-        ...prevState.bucketings,
-        [attrName]: bucketingName,
-      },
-      filters: R.omit([attrName], prevState.filters),
-    }))
-  }
 
   handleSelectLocation = (id) => {
     this.setState(prevState => {
@@ -135,14 +123,12 @@ export default class Dashboard extends Component {
     const {
       filters,
       selectedAttrs,
-      bucketings,
     } = this.state
     window.open(
       `/${datasetName}/api/export?params=${encodeURI(
         JSON.stringify({ 
           filters, 
           selectedAttrs: selectedAttrs,
-          bucketings,
         })
       )}`
     )
@@ -162,7 +148,6 @@ export default class Dashboard extends Component {
     const {
       filters,
       selectedLocations,
-      bucketings,
       selectedAttrs,
     } = this.state
     return (
@@ -172,7 +157,6 @@ export default class Dashboard extends Component {
             datasetName={datasetName}
             filters={filters}
             selectedLocations={selectedLocations}
-            bucketings={bucketings}
             onSelectLocation={this.handleSelectLocation}
           />
         </MapContainer>
@@ -216,7 +200,6 @@ export default class Dashboard extends Component {
               {/*      datasetName={datasetName}*/}
               {/*      attributes={attributes}*/}
               {/*      filters={filters}*/}
-              {/*      bucketings={bucketings}*/}
               {/*      selectedAttrs={selectedAttrs}*/}
               {/*      onExport={this.handleExport}*/}
               {/*    />*/}
@@ -225,7 +208,6 @@ export default class Dashboard extends Component {
             <FilterStatus
               datasetName={datasetName}
               filters={filters}
-              bucketings={bucketings}
               onClear={this.handleClearFilters}
             />
             {
@@ -234,12 +216,9 @@ export default class Dashboard extends Component {
                   key={attrName}
                   datasetName={datasetName}
                   attribute={attributes.find(({ name }) => name === attrName)}
-                  selectedBucketing={bucketings[attrName]}
                   selectedValue={filters[attrName]}
                   filters={R.omit([attrName], filters)}
-                  bucketings={bucketings}
                   onClose={() => this.handleRemoveAttr(attrName)}
-                  onChangeBucketing={({ name }) => this.handleChangeAttrBucketing(name, attrName)}
                   onSelectValue={value => this.handleFilterValue(attrName, value)}
                 />
               )

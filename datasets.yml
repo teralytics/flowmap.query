@@ -12,7 +12,6 @@ datasets:
           origin: start_station_id
           dest: end_station_id
           count: 1
-      K: 0
       locations:
         type: csv
         file: citibike-stations.csv
@@ -24,27 +23,80 @@ datasets:
 
     attributes:
 
+      - name: hour
+        type: numeric
+        label: Hour
+        expression: toHour(start_time)
+
+      - name: month
+        type: category
+        label: Month
+        expression: toString(toMonth(start_date))
+        values:
+          - value: "1"
+            label: Jan
+          - value: "2"
+            label: Feb
+          - value: "3"
+            label: Mar
+          - value: "4"
+            label: Apr
+          - value: "5"
+            label: May
+          - value: "6"
+            label: Jun
+          - value: "7"
+            label: Jul
+          - value: "8"
+            label: Aug
+          - value: "9"
+            label: Sep
+          - value: "10"
+            label: Oct
+          - value: "11"
+            label: Nov
+          - value: "12"
+            label: Dec
+
+      - name: weekday
+        type: category
+        label: Weekday
+        expression: toString(toDayOfWeek(start_date))
+        values:
+          - value: "1"
+            label: Mon
+          - value: "2"
+            label: Tue
+          - value: "3"
+            label: Wed
+          - value: "4"
+            label: Thu
+          - value: "5"
+            label: Fri
+          - value: "6"
+            label: Sat
+          - value: "7"
+            label: Sun
+
       - name: trip_duration
         label: Trip Duration
         type: numeric
-        bucketings:
-        - name: 5-mins
-          label: 300 sec (5 min)
-          buckets: [300,600,900,1200,1500,1800,2100,2400,2700,3000]
 
       - name: user_type
         label: User Type
 
       - name: gender
         label: Gender
+        values:
+          - value: "1"
+            label: Male
+          - value: "2"
+            label: Female
+          - value: "0"
+            label: Other
 
       - name: birth_year
         label: Birth Year
         type: numeric
-        bucketings:
-          - name: decade
-            label: By decade
-            buckets: [1950,1960,1970,1980,1990,2000,2010]
+        expression: ROUND(birth_year/10)*10
 
-      - name: start_date
-        label: Date

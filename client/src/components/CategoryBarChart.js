@@ -28,7 +28,6 @@ import SpinnerBox from './SpinnerBox'
 import LightButton from './LightButton'
 import { formatCount } from '../util/format'
 import * as R from 'ramda'
-import BucketingSelector from './BucketingSelector'
 import Tooltip from './Tooltip'
 
 const Body = styled('div')({
@@ -77,8 +76,7 @@ class CategoryBarChart extends React.Component {
         label,
         name,
         type,
-        categories,
-        bucketings,
+        values,
       },
       attrBreakdownFetch: {
         pending,
@@ -88,10 +86,8 @@ class CategoryBarChart extends React.Component {
         reason,
       },
       selectedValue,
-      selectedBucketing,
       onSelectValue,
       onClose,
-      onChangeBucketing,
     } = this.props
     const {
       tooltip,
@@ -106,13 +102,15 @@ class CategoryBarChart extends React.Component {
         <SizedHorizontalBarChart
           xTickFormat={formatCountShort}
           yTickFormat={
-            type === 'category' && categories ?
-              value => R.pathOr(value, ['label'], categories.find(c => c.name === value))
+            values ?
+              value => R.pathOr(value, ['label'], values.find(c => c.value === value))
               : undefined
           }
           onValueMouseOver={this.handleValueHover}
           onValueClick={(item) => onSelectValue(item.y)}
-          dataPoints={items}
+          dataPoints={values ?
+            R.sortBy(item => values.findIndex(d => d.value === item.y), items)
+            : items}
         />
       )
     }
@@ -120,15 +118,6 @@ class CategoryBarChart extends React.Component {
       <Card className={cardStyle}>
         {refreshing && <SpinnerBox top={7} right={7} size={17} /> }
         <H3>{label || name}</H3>
-        {bucketings &&
-          <div className={css({ marginBottom: 10 })}>
-            <BucketingSelector
-              selectedBucketing={selectedBucketing}
-              bucketings={bucketings}
-              onChange={onChangeBucketing}
-            />
-          </div>
-        }
         <Body className={css({
           height: (items ? items.length : 3) * 20 + 40
         })}>
@@ -157,11 +146,11 @@ export default compose(
       x: +count,
       color: 'SELECTED',
     })
-  )(({ datasetName, attribute, filters, bucketings }) => ({
+  )(({ datasetName, attribute, filters }) => ({
     attrBreakdownFetch: {
       url: `/${datasetName}/api/attr-breakdown/${attribute.name}`,
       method: 'POST',
-      body: JSON.stringify({ filters, bucketings }),
+      body: JSON.stringify({ filters }),
       refreshing: true, // avoids the existing PromiseState from being cleared while fetch is in progress
     },
   })),

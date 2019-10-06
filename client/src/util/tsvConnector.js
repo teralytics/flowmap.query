@@ -16,7 +16,7 @@
  */
 
 import { connect } from 'react-refetch'
-import { tsvParseRows } from 'd3-dsv'
+import { csvParseRows } from 'd3-dsv'
 
 // const cache = new Map()
 
@@ -49,7 +49,7 @@ const tsvConnector = (transformRow) => connect.defaults({
       return text.then(text => new Promise((resolve, reject) => {
         let rows
         try {
-          rows = tsvParseRows(text, transformRow)
+          rows = csvParseRows(text, transformRow)
           resolve(rows)
         } catch (err) {
           reject(err)
