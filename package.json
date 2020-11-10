@@ -9,14 +9,14 @@
     "build": "npm run build-client",
     "dev:client": "cd client && npm start",
     "dev:server": "env $(cat .env) nodemon backend/server.js",
-    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
+    "dev": "concurrently --kill-others-on-fail \"npm run dev:server\" \"npm run dev:client\"",
     "docker": "docker build"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "concurrently": "^4.0.1",
-    "nodemon": "^1.18.9"
+    "concurrently": "^5.3.0",
+    "nodemon": "^2.0.6"
   },
   "dependencies": {
     "csv-parse": "^4.4.6",
